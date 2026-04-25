@@ -27,9 +27,15 @@ export class AuthService {
 
     const hashPassword = await bcrypt.hash(password, salt)
     const hashAnswer = await bcrypt.hash(r_answer, salt)
+
     createUserDto.password = hashPassword
     createUserDto.r_answer = hashAnswer
-    return this.userRepository.save(createUserDto)
+
+    const user = this.userRepository.save(createUserDto)
+    return {
+      success:true,
+      message:"Usuario registrado Correctamente"
+    }
   }
 
   async login(loginUserDto : LoginUserDto){
