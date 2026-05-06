@@ -15,9 +15,4 @@ export class CreateUserDto{
     @MinLength(8)
     password!:string;
 
-    @IsString()
-    r_question!:string;
-
-    @IsString()
-    r_answer!:string
 }

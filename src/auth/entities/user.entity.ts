@@ -12,8 +12,8 @@ export class User{
     email!:string;
     @Column()
     password!:string;
-    @Column()
-    r_question!:string;
-    @Column()
-    r_answer!:string
+    @Column({ nullable:true})
+    resetCode?:string;
+    @Column({ type:'datetime', nullable:true})
+    resetCodeExpire?:Date;
 }

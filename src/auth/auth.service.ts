@@ -6,15 +6,19 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
+import { MailService } from '../mail/mail.srvice';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private userRepository: Repository<User>, private jwtService: JwtService) {
+  constructor(@InjectRepository(User) 
+    private userRepository: Repository<User>, 
+    private jwtService: JwtService,
+    private mailService: MailService) {
   }
 
   async create(createUserDto: CreateUserDto) {
     const salt = 10;
-    const{ email, password, r_answer  } = createUserDto
+    const{ email, password } = createUserDto
     const emailExist = await this.userRepository.findOneBy({email})
     if (emailExist){
       const error = {
@@ -26,10 +30,8 @@ export class AuthService {
     }
 
     const hashPassword = await bcrypt.hash(password, salt)
-    const hashAnswer = await bcrypt.hash(r_answer, salt)
 
     createUserDto.password = hashPassword
-    createUserDto.r_answer = hashAnswer
 
     const user = this.userRepository.save(createUserDto)
     return {
@@ -69,5 +71,68 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync(payload)
     return{token};
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      return {
+        success: true,
+        message: "Si el correo existe, se enviará un enlace"
+      };
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetCode = code;
+    user.resetCodeExpire = new Date(Date.now() + 10 * 60 * 1000);
+
+    await this.userRepository.save(user);
+    
+    await this.mailService.sendPasswordReset(email, code);
+
+    return {
+      success: true,
+      message: "Correo enviado"
+    };
+  }
+
+  async resetPassword(email: string, code: string, newPassword: string) {
+    const user = await this.userRepository.findOneBy({ email });
+   
+    if (!user) {
+      throw new UnauthorizedException("Datos inválidos");
+    }
+
+    if (!user.resetCode) {
+      throw new UnauthorizedException("No hay solicitud de recuperación");
+    }
+
+    if (user.resetCode !== code) {
+      throw new UnauthorizedException("Código incorrecto");
+    }
+
+    const expire = user.resetCodeExpire;
+
+    if (!expire) {
+      throw new UnauthorizedException("Código inválido");
+    }
+
+    if (new Date() > expire) {
+      throw new UnauthorizedException("Código expirado");
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+
+    user.resetCode = undefined;
+    user.resetCodeExpire = undefined;
+
+    await this.userRepository.save(user);
+
+    return {
+      success: true,
+      message: "Contraseña actualizada correctamente"
+    };
   }
 }

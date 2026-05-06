@@ -4,9 +4,10 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { User } from './entities/user.entity';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [
+  imports: [MailModule,
     JwtModule.register({
       global: true,
       secret: 'Estres alto',
@@ -17,4 +18,5 @@ import { User } from './entities/user.entity';
   controllers: [AuthController],
   providers: [AuthService],
 })
+
 export class AuthModule { }
