@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { MailService } from '../mail/mail.srvice';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -134,5 +135,25 @@ export class AuthService {
       success: true,
       message: "Contraseña actualizada correctamente"
     };
+  }
+
+  async findAll() : Promise<User[]> {
+    return this.userRepository.find();
+  }
+
+  async findOne(id: number) : Promise<User | null>{
+    const user = await this.userRepository.findOneBy({id})
+    if(!user) throw new NotFoundException('Usuario no encontrado');
+    return user;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) : Promise<User | null> {
+    await this.userRepository.update(id, updateUserDto)
+    return this.findOne(id);
+  }
+
+  async remove(id: number) : Promise<void>{
+    await this.findOne(id)
+    await this.userRepository.delete(id);
   }
 }

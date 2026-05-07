@@ -3,6 +3,11 @@ import { AuthService } from './auth.service';;
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from './auth.guard';
 import { LoginUserDto } from './dto/login-user.dto';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './role.decorator';
+import { Role } from '../enum/role';
+import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
@@ -36,18 +41,32 @@ export class AuthController {
     return this.authService.resetPassword(body.email, body.code, body.newPassword);
   }
 
-/*@Get(':id')
-  findOne(@Param('id') id: string) {
+  @UseGuards(AuthGuard,RolesGuard)
+  @Roles(Role.ADMIN,Role.DEVELOPER)
+  @Get(':id')
+  findAll(@Param('id') id: string) {
     return this.authService.findOne(+id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('profile')
+  async update(@Body() updateUserDto: UpdateUserDto, @Request() req) {
+    const id= req.user.id
+    const password = updateUserDto.password
+
+    const salt= 10
+
+    if (password) {
+      const hashePassword = await bcrypt.hash(password, salt)
+      updateUserDto.password = hashePassword
+    }
+    return this.authService.update(+id, updateUserDto);
    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
-    }*/ 
+  @UseGuards(AuthGuard)
+  @Delete('profile')
+  remove(@Request() req) {
+    const id = req.user.id
+    return this.authService.remove(+id)
+    } 
 }
