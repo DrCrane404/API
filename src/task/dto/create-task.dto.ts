@@ -1,8 +1,13 @@
-import { IsDate, IsEnum, IsNumber, IsString, Max, MaxLength, Min } from "class-validator";
+import { IsArray, IsDate, IsEnum, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
 import { TaskType } from "../../enum/task-type";
 import { Type } from "class-transformer";
 
 export class CreateTaskDto {
+
+    @IsArray()
+    @IsOptional()
+    usersIds?: number[];
+
     @IsString()
     @MaxLength(30)
     title!:string

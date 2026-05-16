@@ -11,24 +11,24 @@ export class TaskService {
 
   constructor(@InjectRepository(Task) private repoTask:Repository<Task>){}
 
-  async create(createTaskDto: CreateTaskDto, userId:number) {
-    const task = await this.repoTask.create({...createTaskDto, user:{id: userId}})
+  async create(createTaskDto: CreateTaskDto, userIds:number[]) {
+    const task = this.repoTask.create({ ...createTaskDto, users: userIds.map(id => ({ id })) });
     return this.repoTask.save(task);
   }
 
   //Obtener todas las teras en la base de datos
   async findAll() : Promise<Task[]>{
-    return this.repoTask.find({relations:['user'], select:{ user: {id:true, username:true}}});
+    return this.repoTask.find({relations:['users'], select:{ users: {id:true, username:true}}});
   }
 
   //Obtener todas las teras del usuario logeado o de un usuario especifico
   async findAllUser(user_id:number) : Promise<Task[]>{
-    return this.repoTask.find({ where:{user : {id:user_id}}, relations:['user'], select:{ user: {id:true, username:true}} });
+    return this.repoTask.find({ where:{users : {id:user_id}}, relations:['users'], select:{ users: {id:true, username:true}} });
   }
 
   //Obtener una tarea por id
   async findOne(id: number) : Promise<Task | null> {
-    const task = await this.repoTask.findOne({where:{task_id:id}, relations:['user'], select:{ user: {id:true, username:true}}})
+    const task = await this.repoTask.findOne({where:{task_id:id}, relations:['users'], select:{ users: {id:true, username:true}}})
     if(!task) throw new NotFoundException('Tarea no encontrada')
     return task;
   }
@@ -61,6 +61,9 @@ export class TaskService {
   //Esta funcion solamente verifica que el usuario sea dueño de la tarea a modificar/eliminar
   async verify(taskId:number, userId:number, role:Role) : Promise<void>{
     const task = await this.findOne(taskId)
-    if(role === 'USER' && task!.user.id !== userId) throw new ForbiddenException('Las tareas solo se pueden modificar/eliminar por el dueño')
+    if(role === 'USER'){
+      const esParticipante= task!.users.some(u => u.id === userId)
+      if (!esParticipante) throw new ForbiddenException('Las tareas solo se pueden modificar/eliminar por el dueño') 
+    }
   }
 }

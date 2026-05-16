@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { TaskModule } from './task/task.module';
+import { StressLevelModule } from './stress-level/stress-level.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { TaskModule } from './task/task.module';
         database: 'estres',
         autoLoadEntities: true,
         synchronize: true,
-      }), TaskModule],
+      }), TaskModule, StressLevelModule],
   controllers: [AppController],
   providers: [AppService],
 })

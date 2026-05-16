@@ -1,12 +1,16 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../auth/entities/user.entity";
 import { TaskType } from "../../enum/task-type";
 
 @Entity('task')
 export class Task {
-    @ManyToOne(() => User, (user) => user.tasks)
-    @JoinColumn({name:'user_id'})
-    user!:User;
+    @ManyToMany(() => User, (user) => user.tasks)
+    @JoinTable({
+        name:'user_task',
+        joinColumn: {name: 'task_id', referencedColumnName: 'task_id'},
+        inverseJoinColumn: {name: 'user_id', referencedColumnName: 'id'}
+    })
+    users!:User[];
 
     @PrimaryGeneratedColumn()
     task_id!:number

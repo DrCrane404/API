@@ -12,6 +12,9 @@ export class TaskController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createTaskDto: CreateTaskDto, @Request() req) {
+    const userIds= createTaskDto.usersIds?.length
+      ? createTaskDto.usersIds
+      : [req.user.id]
     return this.tasksService.create(createTaskDto, req.user.id)
   }
 
