@@ -27,7 +27,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('/profile')
   profile (@Request() req){
-    return "Estas viendo un perfil protegido pro un Token valido del usuario" + req.user
+    return this.authService.findOne(req.user.id);
   }
 
   //Funcion para solicitar restablecimiento de contraseña mediante pregunta de recuperacion

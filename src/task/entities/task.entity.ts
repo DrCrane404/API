@@ -1,22 +1,25 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../auth/entities/user.entity";
 import { TaskType } from "../../enum/task-type";
 
-@Entity('task')
+@Entity('tasks')
 export class Task {
-    @ManyToMany(() => User, (user) => user.tasks)
-    @JoinTable({
-        name:'user_task',
-        joinColumn: {name: 'task_id', referencedColumnName: 'task_id'},
-        inverseJoinColumn: {name: 'user_id', referencedColumnName: 'id'}
-    })
-    users!:User[];
+
+    @ManyToOne(() => User, (user) => user.tasks)
+    @JoinColumn({name:'user_id'})
+    user!: User;
+    @ManyToMany(() => User, { cascade: true, onDelete: 'CASCADE' })
+    @JoinTable({ name: 'task_members' })
+    members!: User[];
 
     @PrimaryGeneratedColumn()
     task_id!:number
 
-    @Column()
+    @Column({length:20})
     title!:string
+
+    @Column({length:150})
+    description!:string
 
     @Column({type:'enum', enum:TaskType})
     tType!:TaskType
@@ -29,13 +32,20 @@ export class Task {
 
     @Column({type:Date})
     startDate!:Date
-        
+
     @Column({type:Date})
     finishDate!:Date
 
     @Column({type:Boolean, default:false})
-    completed!:boolean
+    completed!:Boolean
 
     @Column({type:Boolean, default:false})
-    update!:Boolean
+    updated!:Boolean
+
+    @Column({type:Boolean, default:false})
+    public!:Boolean
+
+    @Column({nullable:true})
+    code!:String
+
 }

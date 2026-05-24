@@ -12,10 +12,8 @@ export class TaskController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createTaskDto: CreateTaskDto, @Request() req) {
-    const userIds= createTaskDto.usersIds?.length
-      ? createTaskDto.usersIds
-      : [req.user.id]
-    return this.tasksService.create(createTaskDto, req.user.id)
+    const membersIds= createTaskDto.usersIds?? []
+    return this.tasksService.create(createTaskDto, req.user.id, membersIds)
   }
 
   //Obtener todas las tareas de la base de datos
@@ -68,5 +66,17 @@ export class TaskController {
   remove(@Param('id') taskId: string, @Request() req) {
     const {role, id} = req.user
     return this.tasksService.remove(+taskId, id, role);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('public')
+  findPublic() {
+      return this.tasksService.findPublic();
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('join')
+  join(@Body('code') code: string, @Request() req) {
+      return this.tasksService.joinByCode(code, req.user.id);
   }
 }

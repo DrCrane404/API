@@ -1,4 +1,4 @@
-import { IsArray, IsDate, IsEnum, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
+import { IsArray, IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
 import { TaskType } from "../../enum/task-type";
 import { Type } from "class-transformer";
 
@@ -31,4 +31,12 @@ export class CreateTaskDto {
     @Type(() => Date)
     @IsDate()
     finishDate!:Date
+
+    @IsBoolean()
+    @IsOptional()
+    public?: boolean;
+
+    @IsString()
+    @IsOptional()
+    code?: string;
 }

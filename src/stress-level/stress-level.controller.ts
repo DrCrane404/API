@@ -18,8 +18,9 @@ export class StressLevelController {
   // Obtener nivel actual del usuario
   @UseGuards(AuthGuard)
   @Get('nivel')
-  obtenerNivel(@Request() req) {
-      return this.stressService.obtenerNivel(req.user.id);
+  async obtenerNivel(@Request() req) {
+    const perfil = await this.stressService.obtenerNivel(req.user.id);
+    return perfil ?? { existe: false };  // nunca regresa vacío
   }
 
   @Get(':id')

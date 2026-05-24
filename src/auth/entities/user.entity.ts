@@ -5,7 +5,7 @@ import { Task } from "../../task/entities/task.entity";
 @Entity('users')
 export class User{
 
-    @ManyToMany(() => Task, (task) => task.users)
+    @ManyToMany(() => Task, (task) => task.user)
     tasks!: Task[];
 
     @PrimaryGeneratedColumn()
