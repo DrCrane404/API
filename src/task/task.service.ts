@@ -85,6 +85,7 @@ export class TaskService {
     }
   }
 
+  
   async findPublic(): Promise<Task[]> {
       return this.repoTask.find({
           where: { public: true },
