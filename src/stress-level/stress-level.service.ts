@@ -47,19 +47,31 @@ export class StressLevelService {
           .getMany();
 
       // Promedio de estrés de tareas activas (escala 0-10)
-      const promedioTareas = tareas.length > 0
+      const promedioEstres = tareas.length > 0
           ? tareas.reduce((sum, t) => sum + t.stressLevel, 0) / tareas.length
           : 0;
 
+       // Suma de horas diarias ocupadas por tareas activas
+      const horasOcupadas = tareas.reduce((sum, t) => sum + (t.horasDia || 0), 0);
+      const horasDisponibles = 24 - perfil.horasSueno;
+      const excedeHoras = horasOcupadas > horasDisponibles;
+
+      // Penalización extra si duerme poco (menos de 6 horas)
+      const penalizacionSueno = perfil.horasSueno < 6 ? (6 - perfil.horasSueno) : 0;
+
       // Nivel final: 60% cuestionario + 40% tareas
-      const nivelFinal = (perfil.puntuacion * 0.6) + (promedioTareas * 0.4);
+      let nivelFinal = (perfil.puntuacion * 0.6) + (promedioEstres * 0.4) + penalizacionSueno;
+      if (nivelFinal > 10) nivelFinal = 10;
 
       return {
           existe: true,
           puntuacion: perfil.puntuacion,
           categoria: perfil.categoria,
           nivelFinal: Math.round(nivelFinal * 10) / 10,
-          impactoTareas: Math.round(promedioTareas * 10) / 10
+          impactoTareas: Math.round(promedioEstres * 10) / 10,
+          horasOcupadas,
+          horasDisponibles,
+          alertaSueno: excedeHoras
       };
   }
 

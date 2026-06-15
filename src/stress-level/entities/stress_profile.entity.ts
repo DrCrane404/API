@@ -15,7 +15,10 @@ export class StressProfile {
     puntuacion!: number;   
     
     @Column()
-    categoria!: string;    
+    categoria!: string;
+
+    @Column({ type: 'float', default: 8 })
+    horasSueno!: number;
 
     @Column()
     puntajeTotal!: number;

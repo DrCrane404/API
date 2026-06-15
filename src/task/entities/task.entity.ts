@@ -27,6 +27,9 @@ export class Task {
     @Column()
     stressLevel!:number
 
+    @Column({ type: 'float', default: 0 })
+    horasDia!: number;
+
     @CreateDateColumn({type:Date})
     postDate!:Date
 

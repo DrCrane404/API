@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -79,4 +79,10 @@ export class TaskController {
   join(@Body('code') code: string, @Request() req) {
       return this.tasksService.joinByCode(code, req.user.id);
   }
+
+  @UseGuards(AuthGuard)
+  @Get('search')
+  search(@Request() req, @Query('q') query: string) {
+      return this.tasksService.searchPublic(query);
+}
 }

@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString, Max, Min } from "class-validator";
 
 export class CreateStressProfileDto {
      @IsNumber()
@@ -12,4 +12,9 @@ export class CreateStressProfileDto {
     
     @IsNumber()
     puntajeMaximo!: number
+
+    @IsNumber()
+    @Min(0)
+    @Max(24)
+    horasSueno!: number;
 }

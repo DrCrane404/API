@@ -111,4 +111,13 @@ export class TaskService {
       }
       return task;
   }
+
+  async searchPublic(query: string): Promise<Task[]> {
+    return this.repoTask
+        .createQueryBuilder('task')
+        .leftJoinAndSelect('task.user', 'user')
+        .where('task.public = true')
+        .andWhere('task.title LIKE :q', { q: `%${query}%` })
+        .getMany();
+  }
 }

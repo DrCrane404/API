@@ -21,6 +21,11 @@ export class CreateTaskDto {
 
     @IsNumber()
     @Min(0)
+    @Max(24)
+    horasDia!: number;
+
+    @IsNumber()
+    @Min(0)
     @Max(10)
     stressLevel!:number
 
