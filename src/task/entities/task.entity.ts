@@ -30,23 +30,23 @@ export class Task {
     @Column({ type: 'float', default: 0 })
     horasDia!: number;
 
-    @CreateDateColumn({type:Date})
+    @CreateDateColumn({type:'date'})
     postDate!:Date
 
-    @Column({type:Date})
+    @Column({type:'date'})
     startDate!:Date
 
-    @Column({type:Date})
+    @Column({type:'date'})
     finishDate!:Date
 
-    @Column({type:Boolean, default:false})
-    completed!:Boolean
+    @Column({type:'boolean', default:false})
+    completed!:boolean
 
-    @Column({type:Boolean, default:false})
-    updated!:Boolean
+    @Column({type:'boolean', default:false})
+    updated!:boolean
 
-    @Column({type:Boolean, default:false})
-    public!:Boolean
+    @Column({type:'boolean', default:false})
+    public!:boolean
 
     @Column({nullable:true})
     code!:String
