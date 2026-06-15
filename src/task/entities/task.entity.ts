@@ -30,13 +30,13 @@ export class Task {
     @Column({ type: 'float', default: 0 })
     horasDia!: number;
 
-    @CreateDateColumn({type:'date'})
+    @CreateDateColumn({type:'timestamp'})
     postDate!:Date
 
-    @Column({type:'date'})
+    @Column({type:'timestamp'})
     startDate!:Date
 
-    @Column({type:'date'})
+    @Column({type:'timestamp'})
     finishDate!:Date
 
     @Column({type:'boolean', default:false})

@@ -26,7 +26,7 @@ export class User{
     @Column({ nullable:true})
     resetCode?:string;
 
-    @Column({ type:'datetime', nullable:true})
+    @Column({ type:'timestamp', nullable:true})
     resetCodeExpire?:Date;
 
     @Column({ type:'enum', enum:Role, default:Role.USER})
