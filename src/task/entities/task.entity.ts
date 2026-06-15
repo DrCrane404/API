@@ -49,6 +49,6 @@ export class Task {
     public!:boolean
 
     @Column({nullable:true})
-    code!:String
+    code!:string
 
 }
