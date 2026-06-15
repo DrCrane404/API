@@ -23,7 +23,7 @@ import { StressLevelModule } from './stress-level/stress-level.module';
     autoLoadEntities:true,
     synchronize: true,
     ssl: { rejectUnauthorized: false } // crea las tablas automáticamente la primera vez
-    })],
+    }),AuthModule,TaskModule,StressLevelModule],
   controllers: [AppController],
   providers: [AppService],
 })
