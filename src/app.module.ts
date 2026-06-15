@@ -12,17 +12,17 @@ import { StressLevelModule } from './stress-level/stress-level.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    AuthModule, 
+    
     TypeOrmModule.forRoot({
-        type: 'mysql',
-        host: 'localhost',
-        port: 3306,
-        username: 'root',
-        password: '',
-        database: 'estres',
-        autoLoadEntities: true,
-        synchronize: true,
-      }), TaskModule, StressLevelModule],
+    type: 'mysql',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT ?? '3306'),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    autoLoadEntities:true,
+    synchronize: true, // crea las tablas automáticamente la primera vez
+})],
   controllers: [AppController],
   providers: [AppService],
 })

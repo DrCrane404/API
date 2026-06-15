@@ -10,7 +10,7 @@ import { MailModule } from '../mail/mail.module';
   imports: [MailModule,
     JwtModule.register({
       global: true,
-      secret: 'Estres alto',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '2h' },
     }),
     TypeOrmModule.forFeature([User]),
