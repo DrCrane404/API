@@ -45,41 +45,50 @@ export class TaskService {
   //Obtener todas las teras del usuario logeado o de un usuario especifico
   async findAllUser(user_id: number): Promise<Task[]> {
     // Busca tareas donde el usuario es creador O es miembro
-    return this.repoTask
-      .createQueryBuilder('task')
-      .leftJoinAndSelect('task.user', 'user')
-      .leftJoinAndSelect('task.members', 'members')
-      .leftJoinAndMapOne(
-        'task.stressLevel',
-        'task.stressLevels',
-        'stress',
-        'stress.user_id = :id',
-        { id: user_id }
-      )
-      .where('user.id = :id', { id: user_id })
-      .orWhere('members.id = :id', { id: user_id })
-      .getMany();
+    const tareas = await this.repoTask
+        .createQueryBuilder('task')
+        .leftJoinAndSelect('task.user', 'user')
+        .leftJoinAndSelect('task.members', 'members')
+        .leftJoinAndMapOne(
+            'task.stressLevel',
+            'task.stressLevels',
+            'stress',
+            'stress.user_id = :id',
+            { id: user_id }
+        )
+        .where('user.id = :id', { id: user_id })
+        .orWhere('members.id = :id', { id: user_id })
+        .getMany();
+    return tareas.map(t => ({
+        ...t,
+        stressLevel: (t as any).stressLevel?.level ?? 0
+    }));
+   
   }
 
   //Obtener una tarea por id
-  async findOne(id: number, user_id: number): Promise<Task | null> {
+  async findOne(id: number, user_id: number): Promise<any> {
     const task = await this.repoTask
-      .createQueryBuilder('task')
-      .leftJoinAndSelect('task.user', 'user')
-      .leftJoinAndSelect('task.members', 'members')
-      .leftJoinAndMapOne(
-        'task.stressLevel',
-        'task.stressLevels',
-        'stress',
-        'stress.user_id = :user_id',
-        { user_id }
-      )
-      .where('task.task_id = :id', { id })
-      .getOne();
+        .createQueryBuilder('task')
+        .leftJoinAndSelect('task.user', 'user')
+        .leftJoinAndSelect('task.members', 'members')
+        .leftJoinAndMapOne(
+            'task.stressLevel',
+            'task.stressLevels',
+            'stress',
+            'stress.user_id = :user_id',
+            { user_id }
+        )
+        .where('task.task_id = :id', { id })
+        .getOne();
 
     if (!task) throw new NotFoundException('Tarea no encontrada');
-    return task;
-  }
+
+    return {
+        ...task,
+        stressLevel: (task as any).stressLevel?.level ?? 0
+    };
+}
 
   //Modificar los datos de la tarea, asi como el nivel de estres del dueño de la tarea
   async update(taskId: number, userId: number, role: Role, updateTaskDto: UpdateTaskDto): Promise<Task | null> {
