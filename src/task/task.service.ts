@@ -92,43 +92,57 @@ export class TaskService {
 
   //Modificar los datos de la tarea, asi como el nivel de estres del dueño de la tarea
   async update(taskId: number, userId: number, role: Role, updateTaskDto: UpdateTaskDto): Promise<Task | null> {
-    //Si el rol del usuario es 'user', se verifica que sea su tarea, si no es, se bloquea el proceso
-    await this.verify(taskId, userId, role)
-
-    //Se separa el nivel de estrés para no intentar guardarlo en Task
     const { stressLevel, ...taskData } = updateTaskDto;
 
-    //Actualiza los datos normales de la tarea
-    await this.repoTask.update(taskId, {
-      ...taskData,
-      updated: true
-    });
+    const soloEstres = Object.keys(taskData).length === 0 && stressLevel !== undefined;
 
-    //Si viene stressLevel, se actualiza la relación user-task
+    if (soloEstres) {
+        // Solo cambia su propio nivel de estrés — verifica que sea participante
+        await this.verifyParticipante(taskId, userId, role);
+    } else {
+        // Modifica datos de la tarea — solo el dueño
+        await this.verify(taskId, userId, role);
+
+        await this.repoTask.update(taskId, {
+            ...taskData,
+            updated: true
+        });
+    }
+
     if (stressLevel !== undefined) {
-      const memberStress = await this.memberStressRepository.findOne({
-        where: {
-          user: { id: userId },
-          task: { task_id: taskId }
-        }
-      });
-
-      if (!memberStress) {
-        const newMemberStress = this.memberStressRepository.create({
-          level: stressLevel,
-          user: { id: userId } as User,
-          task: { task_id: taskId } as Task
+        const memberStress = await this.memberStressRepository.findOne({
+            where: {
+                user: { id: userId },
+                task: { task_id: taskId }
+            }
         });
 
-        await this.memberStressRepository.save(newMemberStress);
-      } else {
-        memberStress.level = stressLevel;
-        await this.memberStressRepository.save(memberStress);
-      }
+        if (!memberStress) {
+            const newMemberStress = this.memberStressRepository.create({
+                level: stressLevel,
+                user: { id: userId } as User,
+                task: { task_id: taskId } as Task
+            });
+            await this.memberStressRepository.save(newMemberStress);
+        } else {
+            memberStress.level = stressLevel;
+            await this.memberStressRepository.save(memberStress);
+        }
     }
 
     return this.findOne(taskId, userId)
-  }
+}
+
+// Nueva función — verifica que sea dueño O miembro
+async verifyParticipante(taskId: number, userId: number, role: Role): Promise<void> {
+    const task = await this.findOne(taskId, userId)
+    if (role === 'USER') {
+        const esDueno = task!.user?.id === userId
+        const esMiembro = task!.members?.some((m: any) => m.id === userId)
+        if (!esDueno && !esMiembro) 
+            throw new ForbiddenException('No participas en esta tarea')
+    }
+}
 
   //Marcar una tarea como completa
   async completeTask(taskId: number, userId: number, role: Role): Promise<void> {
