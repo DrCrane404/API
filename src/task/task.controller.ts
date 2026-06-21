@@ -36,7 +36,13 @@ export class TaskController {
   finAllUser(@Param('id') id:string){
     return this.tasksService.findAllUser(+id);
   }
-
+  
+  @UseGuards(AuthGuard)
+  @Get('search')
+  search(@Request() req, @Query('q') query: string) {
+      return this.tasksService.searchPublic(query);
+  }
+  
   //Obtener una tarea especifica, por id
   @UseGuards(AuthGuard)
   @Get(':id')
@@ -81,9 +87,5 @@ export class TaskController {
       return this.tasksService.joinByCode(code, req.user.id);
   }
 
-  @UseGuards(AuthGuard)
-  @Get('search')
-  search(@Request() req, @Query('q') query: string) {
-      return this.tasksService.searchPublic(query);
-}
+
 }
