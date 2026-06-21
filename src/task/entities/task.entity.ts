@@ -34,12 +34,10 @@ export class Task {
     @CreateDateColumn({type:'timestamp'})
     postDate!:Date
     
-    //Esto no lo cambies
-    @Column({type:'datetime'})
+    @Column({type:'timestamp'})
     startDate!:Date
 
-    //Esto tampoco
-    @Column({type:'datetime'})
+    @Column({type:'timestamp'})
     finishDate!:Date
 
     @Column({type:'boolean', default:false})
