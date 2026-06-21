@@ -194,16 +194,11 @@ export class TaskService {
   }
 
   async searchPublic(query: string): Promise<Task[]> {
-    console.log('QUERY RECIBIDO:', query);
-    
-    const resultado = await this.repoTask
+    return this.repoTask
         .createQueryBuilder('task')
         .leftJoinAndSelect('task.user', 'user')
         .where('task.public = true')
-        .andWhere('task.title LIKE :q', { q: `%${query}%` })
+        .andWhere('task.title ILIKE :q', { q: `%${query}%` })
         .getMany();
-    
-    console.log('RESULTADO:', resultado);
-    return resultado;
 }
 }
